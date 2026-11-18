@@ -1,0 +1,865 @@
+/* ===================================================
+   HUKMDOR: QIROLLIKLAR JANGI - ASOSIY USLUB (CSS)
+   =================================================== */
+
+:root {
+  --color-gold: #f4c430;
+  --color-gold-hover: #ffd966;
+  --color-gold-dark: #b8860b;
+  --color-bg-dark: #0f1218;
+  --color-card-bg: rgba(22, 27, 36, 0.94);
+  --color-border: #4a3c28;
+  --color-border-gold: #c5a059;
+  --color-text-main: #f0ebe1;
+  --color-text-muted: #a39e93;
+
+  /* Qirolliklar Ranglari */
+  --blue-kingdom: #2563eb;
+  --blue-glow: rgba(37, 99, 235, 0.5);
+  --red-kingdom: #dc2626;
+  --red-glow: rgba(220, 38, 38, 0.5);
+  --green-kingdom: #16a34a;
+  --green-glow: rgba(22, 163, 74, 0.5);
+  --yellow-kingdom: #d97706;
+  --yellow-glow: rgba(217, 119, 6, 0.5);
+  --neutral-castle: #94a3b8;
+
+  --font-royal: 'Cinzel', 'MedievalSharp', 'Times New Roman', serif;
+  --font-ui: 'Montserrat', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg-dark);
+  font-family: var(--font-ui);
+  color: var(--color-text-main);
+}
+
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #1b2432 0%, #0d1117 100%);
+}
+
+/* ================= CANVAS ================= */
+#gameCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  z-index: 1;
+}
+
+/* ================= HUD PANELLARI ================= */
+.hud-panel {
+  position: absolute;
+  z-index: 10;
+  pointer-events: auto;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Tepa Panel */
+#top-bar {
+  top: 14px;
+  left: 20px;
+  right: 20px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(15, 20, 30, 0.88);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 12px;
+  padding: 0 16px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(244, 196, 48, 0.1);
+}
+
+.hud-left, .hud-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.level-indicator {
+  display: flex;
+  flex-direction: column;
+}
+
+.level-indicator .badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-gold);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.level-indicator .level-title {
+  font-family: var(--font-royal);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Markaziy Qirolliklar Holati */
+.hud-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  margin: 0 20px;
+}
+
+.kingdoms-score {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.k-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+  font-weight: 700;
+  border: 1.5px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.k-badge.blue { border-color: var(--blue-kingdom); color: #93c5fd; }
+.k-badge.red { border-color: var(--red-kingdom); color: #fca5a5; }
+.k-badge.green { border-color: var(--green-kingdom); color: #86efac; }
+.k-badge.yellow { border-color: var(--yellow-kingdom); color: #fde047; }
+.k-badge.dead { opacity: 0.35; filter: grayscale(1); }
+
+.resource-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gold-box .res-val { color: #facc15; }
+.army-box .res-val { color: #60a5fa; }
+
+/* Pastki Panel */
+#bottom-bar {
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(15, 20, 30, 0.92);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 16px;
+  padding: 10px 18px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  max-width: 95vw;
+}
+
+/* Yuborish Foizi */
+.dispatch-toggle-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.4);
+  padding: 4px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.dispatch-toggle-wrap .label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.btn-toggle {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle.active {
+  background: var(--color-gold);
+  color: #111;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 10px rgba(244, 196, 48, 0.4);
+}
+
+/* Tezkor tugmalar */
+.quick-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-action {
+  background: linear-gradient(180deg, #2a3447 0%, #1a2230 100%);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-action:hover {
+  background: linear-gradient(180deg, #374660 0%, #243044 100%);
+  border-color: var(--color-gold);
+}
+
+.btn-action.gold-action {
+  background: linear-gradient(180deg, #b8860b 0%, #855f05 100%);
+  border-color: var(--color-gold);
+}
+
+.btn-action.gold-action:hover {
+  background: linear-gradient(180deg, #d49b0d 0%, #a07409 100%);
+}
+
+/* Sehrlar Paneli */
+.spells-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.spell-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(180deg, #1f2735 0%, #121822 100%);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.15s, border-color 0.2s;
+}
+
+.spell-btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: #ffd966;
+  box-shadow: 0 4px 15px rgba(244, 196, 48, 0.3);
+}
+
+.spell-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.spell-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.spell-btn .spell-icon {
+  font-size: 18px;
+}
+
+.spell-btn .spell-name {
+  font-size: 9px;
+  font-weight: 700;
+  margin-top: 2px;
+  text-transform: uppercase;
+}
+
+.spell-btn .spell-cost {
+  font-size: 9px;
+  color: var(--color-gold);
+  font-weight: 700;
+}
+
+.spell-cooldown {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  transition: height 0.1s linear;
+}
+
+/* Sehr Nishoni Eslatmasi */
+#spell-target-hint {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  background: rgba(184, 134, 11, 0.95);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 13px;
+  border: 2px solid #ffd966;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  animation: pulseHint 1.5s infinite;
+}
+
+@keyframes pulseHint {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+/* ================= QAL'A TOOLTIP ================= */
+#castle-tooltip {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  background: rgba(15, 20, 30, 0.95);
+  border: 1.5px solid var(--color-border-gold);
+  border-radius: 10px;
+  padding: 10px 14px;
+  min-width: 170px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  transition: opacity 0.15s ease;
+}
+
+.tt-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-royal);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--color-gold);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.tt-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 3px;
+  color: var(--color-text-muted);
+}
+
+.tt-row strong {
+  color: #fff;
+}
+
+/* ================= OVERLAY VA MODALLAR ================= */
+.screen-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.screen-overlay.hidden, .hidden {
+  display: none !important;
+}
+
+.menu-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 11, 16, 0.82);
+  backdrop-filter: blur(10px);
+}
+
+.menu-card, .modal-card {
+  position: relative;
+  z-index: 2;
+  background: var(--color-card-bg);
+  border: 2px solid var(--color-border-gold);
+  border-radius: 20px;
+  padding: 36px 40px;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(244, 196, 48, 0.08);
+  text-align: center;
+  max-width: 540px;
+  width: 90%;
+  animation: modalEnter 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes modalEnter {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.royal-emblem {
+  font-size: 44px;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 0 15px rgba(244, 196, 48, 0.5));
+}
+
+.game-title {
+  font-family: var(--font-royal);
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(180deg, #ffffff 0%, #ffd966 60%, #b8860b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  margin-bottom: 4px;
+}
+
+.game-subtitle {
+  font-family: var(--font-royal);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: var(--color-gold);
+}
+
+.title-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0 24px;
+  color: var(--color-border-gold);
+  font-size: 14px;
+}
+
+.title-divider::before, .title-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-border-gold), transparent);
+  margin: 0 12px;
+}
+
+.menu-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ================= TUGMALAR ================= */
+.btn-royal {
+  position: relative;
+  border: 1.5px solid var(--color-border-gold);
+  padding: 14px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-royal);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.btn-royal.btn-primary {
+  background: linear-gradient(180deg, #d4a017 0%, #855f05 100%);
+  color: #1a1202;
+  font-weight: 900;
+  box-shadow: 0 6px 20px rgba(212, 160, 23, 0.35);
+}
+
+.btn-royal.btn-primary:hover {
+  background: linear-gradient(180deg, #f5c431 0%, #a47506 100%);
+  box-shadow: 0 8px 25px rgba(244, 196, 48, 0.55);
+  transform: translateY(-2px);
+}
+
+.btn-royal.btn-secondary {
+  background: linear-gradient(180deg, #242c3d 0%, #151a24 100%);
+  color: var(--color-text-main);
+}
+
+.btn-royal.btn-secondary:hover {
+  background: linear-gradient(180deg, #333d52 0%, #1e2533 100%);
+  border-color: #ffd966;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-royal:active {
+  transform: translateY(1px);
+}
+
+.btn-icon {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--color-gold);
+}
+
+.version-tag {
+  margin-top: 24px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+}
+
+/* ================= MODAL HEADER & CLOSES ================= */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1.5px solid var(--color-border);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-family: var(--font-royal);
+  font-size: 20px;
+  color: var(--color-gold);
+  letter-spacing: 1px;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-close:hover {
+  color: #fff;
+}
+
+.modal-footer {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ================= BOSQICHLAR RO'YXATI (LEVELS) ================= */
+.levels-card {
+  max-width: 680px;
+}
+
+.levels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 16px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.level-card-btn {
+  background: linear-gradient(180deg, #1f2737 0%, #131923 100%);
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px 12px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  color: var(--color-text-main);
+  position: relative;
+}
+
+.level-card-btn:hover:not(.locked) {
+  border-color: var(--color-gold);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+.level-card-btn.locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.8);
+}
+
+.level-num {
+  font-family: var(--font-royal);
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--color-gold);
+  margin-bottom: 4px;
+}
+
+.level-name {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.level-stars {
+  color: #666;
+  font-size: 14px;
+}
+
+.level-stars .star.earned {
+  color: #facc15;
+}
+
+/* ================= SKIRMISH SOZLAMALARI ================= */
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  text-align: left;
+}
+
+.setting-item label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-gold);
+  margin-bottom: 8px;
+}
+
+.select-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-opt {
+  flex: 1;
+  min-width: 100px;
+  background: #18202d;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  color: var(--color-text-main);
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.btn-opt:hover {
+  background: #232c3d;
+}
+
+.btn-opt.active {
+  background: linear-gradient(180deg, #d4a017 0%, #855f05 100%);
+  color: #111;
+  border-color: var(--color-gold);
+  box-shadow: 0 0 12px rgba(244, 196, 48, 0.3);
+}
+
+/* ================= YO'RIQNOMA (INSTRUCTIONS) ================= */
+.info-card {
+  max-width: 620px;
+}
+
+.info-body {
+  max-height: 60vh;
+  overflow-y: auto;
+  text-align: left;
+  padding-right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-section h3 {
+  font-family: var(--font-royal);
+  color: var(--color-gold);
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.info-section p, .info-section li {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #ddd;
+}
+
+.info-section ul {
+  padding-left: 20px;
+}
+
+.info-section li {
+  margin-bottom: 6px;
+}
+
+.castle-types-preview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.c-type-item {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.c-type-item .c-icon {
+  font-size: 16px;
+  margin-right: 4px;
+}
+
+/* ================= G'ALABA & MAG'LUBIYAT ================= */
+.outcome-banner {
+  font-size: 38px;
+  margin-bottom: 10px;
+}
+
+.outcome-title {
+  font-family: var(--font-royal);
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.victory-title {
+  color: #facc15;
+  text-shadow: 0 0 20px rgba(244, 196, 48, 0.6);
+}
+
+.defeat-title {
+  color: #ef4444;
+  text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+}
+
+.outcome-sub {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 20px;
+}
+
+.stars-rating {
+  font-size: 36px;
+  color: #4b5563;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.stars-rating .star.active {
+  color: #facc15;
+  filter: drop-shadow(0 0 8px rgba(244, 196, 48, 0.7));
+}
+
+.battle-stats {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-box {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 16px;
+  min-width: 90px;
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.stat-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.outcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Responsive moslashuv */
+@media (max-width: 768px) {
+  #top-bar {
+    top: 6px;
+    left: 8px;
+    right: 8px;
+    padding: 0 10px;
+    height: 48px;
+  }
+  .level-indicator .level-title {
+    display: none;
+  }
+  #bottom-bar {
+    bottom: 8px;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .spell-btn {
+    width: 48px;
+    height: 48px;
+  }
+  .spell-btn .spell-name {
+    display: none;
+  }
+  .btn-action {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+}
+

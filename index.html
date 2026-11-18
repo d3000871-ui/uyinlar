@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Hukmdor: Qirolliklar Jangi | Medieval Kingdom Conquest</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=MedievalSharp&family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- ASOSIY O'YIN KONTEYNERI -->
+  <div id="game-container">
+    
+    <!-- CANVAS: JANG MAYDONI -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- TEPA PANEL: RESURSLAR VA STATUS -->
+    <div id="top-bar" class="hud-panel hidden">
+      <div class="hud-left">
+        <button id="btn-pause" class="btn-icon" title="Pauza / Menyu">
+          <span class="icon">⏸</span>
+        </button>
+        <div class="level-indicator">
+          <span class="badge" id="level-badge">1-Bosqich</span>
+          <span class="level-title" id="level-title">Birinchi Qadam</span>
+        </div>
+      </div>
+
+      <div class="hud-center">
+        <!-- QIROLLIKLAR STATUSI -->
+        <div class="kingdoms-score" id="kingdoms-score">
+          <!-- Dinamik to'ldiriladi: Moviy, Qizil, Yashil, Oltin -->
+        </div>
+      </div>
+
+      <div class="hud-right">
+        <div class="resource-box gold-box" title="Xazinadagi oltin">
+          <span class="res-icon">🪙</span>
+          <span id="gold-count" class="res-val">100</span>
+        </div>
+        <div class="resource-box army-box" title="Jami armiyangiz">
+          <span class="res-icon">⚔️</span>
+          <span id="total-army-count" class="res-val">50</span>
+        </div>
+        <button id="btn-audio" class="btn-icon" title="Ovozni yoqish/o'chirish">
+          <span class="icon" id="audio-icon">🔊</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- PASTI PANEL: SEHRLAR VA TEZKOR BOSHQARUV -->
+    <div id="bottom-bar" class="hud-panel hidden">
+      <!-- Askar yuborish foizi sozlamasi -->
+      <div class="dispatch-toggle-wrap">
+        <span class="label">Yuborish:</span>
+        <button id="btn-dispatch-50" class="btn-toggle active" data-percent="0.5">50%</button>
+        <button id="btn-dispatch-100" class="btn-toggle" data-percent="1.0">100%</button>
+      </div>
+
+      <!-- Tezkor tanlash -->
+      <div class="quick-controls">
+        <button id="btn-select-all" class="btn-action" title="Barcha qal'alaringizni tanlash (Yoki ikki marta bosing)">
+          🏰 Barchasini Tanlash
+        </button>
+        <button id="btn-upgrade-selected" class="btn-action gold-action" title="Tanlangan qal'ani yangilash (50 oltin)">
+          ⬆️ Qal'ani Kuchaytirish (<span id="upgrade-cost-text">50</span>🪙)
+        </button>
+      </div>
+
+      <!-- Sehrlar (Spells) -->
+      <div class="spells-bar">
+        <button class="spell-btn" id="spell-lightning" data-cost="60" title="Chaqmoq: Dushman askarlarini uradi [Tugma: 1]">
+          <span class="spell-icon">⚡</span>
+          <span class="spell-name">Chaqmoq</span>
+          <span class="spell-cost">60🪙</span>
+          <div class="spell-cooldown" id="cd-lightning"></div>
+        </button>
+
+        <button class="spell-btn" id="spell-shield" data-cost="50" title="Temir Qalqon: Qal'a mudofaasini 10s ga 3x qiladi [Tugma: 2]">
+          <span class="spell-icon">🛡️</span>
+          <span class="spell-name">Qalqon</span>
+          <span class="spell-cost">50🪙</span>
+          <div class="spell-cooldown" id="cd-shield"></div>
+        </button>
+
+        <button class="spell-btn" id="spell-rush" data-cost="75" title="Otliqlar Shiddati: Askarlar 8s tez yuguradi [Tugma: 3]">
+          <span class="spell-icon">🐎</span>
+          <span class="spell-name">Shiddat</span>
+          <span class="spell-cost">75🪙</span>
+          <div class="spell-cooldown" id="cd-rush"></div>
+        </button>
+
+        <button class="spell-btn" id="spell-meteor" data-cost="100" title="Olovli Meteor: Qal'a mudofaasini maydalaydi [Tugma: 4]">
+          <span class="spell-icon">☄️</span>
+          <span class="spell-name">Meteor</span>
+          <span class="spell-cost">100🪙</span>
+          <div class="spell-cooldown" id="cd-meteor"></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- SEHR NISHONINI TANLASH ESLATMASI -->
+    <div id="spell-target-hint" class="hidden">
+      <span>Nishon qal'a yoki qo'shin ustiga bosing! (Bekor qilish: Escape / Sichqonchaning o'ng tugmasi)</span>
+    </div>
+
+    <!-- QAL'A HAQIDA MA'LUMOT (TOOLTIP) -->
+    <div id="castle-tooltip" class="hidden">
+      <div class="tt-header">
+        <span class="tt-flag">🏰</span>
+        <span class="tt-name" id="tt-name">Qirol Qasri</span>
+      </div>
+      <div class="tt-body">
+        <div class="tt-row"><span>Egasi:</span> <strong id="tt-owner">Moviy Qirollik</strong></div>
+        <div class="tt-row"><span>Turi:</span> <strong id="tt-type">Poytaxt</strong></div>
+        <div class="tt-row"><span>Daraja:</span> <strong id="tt-level">1-daraja</strong></div>
+        <div class="tt-row"><span>Himoya:</span> <strong id="tt-def">+30%</strong></div>
+        <div class="tt-row"><span>Askar o'sishi:</span> <strong id="tt-growth">+2 / sek</strong></div>
+      </div>
+    </div>
+
+    <!-- BOSHLANG'ICH ASOSIY MENYU -->
+    <div id="main-menu" class="screen-overlay">
+      <div class="menu-backdrop"></div>
+      <div class="menu-card">
+        <div class="royal-emblem">👑</div>
+        <h1 class="game-title">HUKMDOR</h1>
+        <p class="game-subtitle">QIROLLIKLAR JANGI</p>
+        <div class="title-divider"><span>⚔️</span></div>
+
+        <div class="menu-actions">
+          <button id="btn-campaign" class="btn-royal btn-primary">
+            <span class="btn-text">KAMPANIYA (BOSQICHLAR)</span>
+          </button>
+          <button id="btn-skirmish" class="btn-royal btn-secondary">
+            <span class="btn-text">ERKIN JANG (SKIRMISH)</span>
+          </button>
+          <button id="btn-instructions" class="btn-royal btn-secondary">
+            <span class="btn-text">QOIDALAR VA YO'RIQNOMA</span>
+          </button>
+        </div>
+
+        <div class="version-tag">Versiya 1.0 • O'zbek tilidagi strategiya o'yini</div>
+      </div>
+    </div>
+
+    <!-- BOSQICHLARNI TANLASH EKRANI (CAMPAIGN) -->
+    <div id="level-select-modal" class="screen-overlay hidden">
+      <div class="menu-backdrop"></div>
+      <div class="modal-card levels-card">
+        <div class="modal-header">
+          <h2>KAMPANIYA BOSQICHLARI</h2>
+          <button class="btn-close" id="btn-close-levels">✖</button>
+        </div>
+        <div class="levels-grid" id="levels-container">
+          <!-- Javascript dinamik joylashtiradi -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn-royal btn-secondary" id="btn-back-from-levels">Orqaga</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ERKIN JANG (SKIRMISH) SOZLAMALARI -->
+    <div id="skirmish-modal" class="screen-overlay hidden">
+      <div class="menu-backdrop"></div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>ERKIN JANG SOZLAMALARI</h2>
+          <button class="btn-close" id="btn-close-skirmish">✖</button>
+        </div>
+        <div class="modal-body settings-body">
+          <div class="setting-item">
+            <label>Xarita o'lchami:</label>
+            <div class="select-group" id="opt-map-size">
+              <button class="btn-opt" data-val="small">Kichik (8 Qal'a)</button>
+              <button class="btn-opt active" data-val="medium">O'rtacha (12 Qal'a)</button>
+              <button class="btn-opt" data-val="large">Yirik (18 Qal'a)</button>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>Raqib Qirolliklar soni:</label>
+            <div class="select-group" id="opt-ai-count">
+              <button class="btn-opt" data-val="1">1 ta (Yakkama-yakka)</button>
+              <button class="btn-opt active" data-val="2">2 ta Qirollik</button>
+              <button class="btn-opt" data-val="3">3 ta Qirollik (To'rtlik)</button>
+            </div>
+          </div>
+          <div class="setting-item">
+            <label>Sun'iy Intellekt (AI) Darajasi:</label>
+            <div class="select-group" id="opt-ai-diff">
+              <button class="btn-opt" data-val="easy">Oson</button>
+              <button class="btn-opt active" data-val="normal">O'rtacha</button>
+              <button class="btn-opt" data-val="hard">Qiyin / Ayyor</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-royal btn-primary" id="btn-start-skirmish">JANGNI BOSHLASH ⚔️</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QOIDALAR VA YO'RIQNOMA MODAL -->
+    <div id="instructions-modal" class="screen-overlay hidden">
+      <div class="menu-backdrop"></div>
+      <div class="modal-card info-card">
+        <div class="modal-header">
+          <h2>O'YIN QOIDALARI VA BOSHQARUV</h2>
+          <button class="btn-close" id="btn-close-info">✖</button>
+        </div>
+        <div class="modal-body info-body">
+          <div class="info-section">
+            <h3>🎯 O'yin Maqsadi</h3>
+            <p>Siz <strong>Moviy Saltanat</strong> hukmdorisiz. Xaritadagi barcha dushman qirolliklarni mag'lub etib, butun yerlarni zabt eting va imperatorga aylaning!</p>
+          </div>
+
+          <div class="info-section">
+            <h3>🎮 Boshqaruv usullari</h3>
+            <ul>
+              <li><strong>Hujum yoki Ko'chirish:</strong> O'z qal'angizdan dushman yoki neytral qal'aga sichqoncha bilan tortib ulang (Drag & Drop) yoki avval o'z qal'angizni, so'ngra nishonni bosing.</li>
+              <li><strong>Bir nechta qal'ani birdan tanlash:</strong> Maydonda sichqonchani bosib ramka chizing yoki qal'angizga <strong>ikki marta</strong> bosing.</li>
+              <li><strong>Yuborish foizi:</strong> Pastdagi 50% yoki 100% tugmasi orqali qancha askar yuborishni tanlang.</li>
+              <li><strong>Qal'ani kuchaytirish:</strong> Qal'ani tanlab, pastdagi "Kuchaytirish" tugmasini bosing (darajasi oshganda mudofaa va askar o'sishi ortadi).</li>
+              <li><strong>Sehrlar:</strong> Klaviatura orqali <strong>1, 2, 3, 4</strong> tugmalari yoki pastdagi piktogrammalarni bosing.</li>
+            </ul>
+          </div>
+
+          <div class="info-section">
+            <h3>🏰 Qal'a Turlari</h3>
+            <div class="castle-types-preview">
+              <div class="c-type-item">
+                <span class="c-icon">👑</span>
+                <strong>Poytaxt:</strong> Yuqori sig'im, tez askar ishlab chiqarish va barqaror oltin tushumi.
+              </div>
+              <div class="c-type-item">
+                <span class="c-icon">🛡️</span>
+                <strong>Istehkom (Fort):</strong> Mudofaasi 2x kuchli. Yaqinlashgan dushmanga kamondan o'q otadi!
+              </div>
+              <div class="c-type-item">
+                <span class="c-icon">⚔️</span>
+                <strong>Kazarma (Shahar):</strong> Askarlar 2 barobar tezroq ko'payadi, ammo mudofaasi kamroq.
+              </div>
+              <div class="c-type-item">
+                <span class="c-icon">🪙</span>
+                <strong>Oltin Koni / Bozor:</strong> Har soniyada katta miqdorda oltin ishlab chiqaradi.
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>⚔️ Taktik Maslahat</h3>
+            <p>Avval o'zingizga yaqin va kam sonli askarlarga ega neytral (oq) qal'alarni egallang. Kuchlaringiz birlashgach, dushmanning eng zaif qal'asiga hamma tomondan zarba bering!</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-royal btn-primary" id="btn-info-gotit">Tushunarli! Jang qilamiz</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAUZA MENYUSI -->
+    <div id="pause-modal" class="screen-overlay hidden">
+      <div class="menu-backdrop"></div>
+      <div class="modal-card pause-card">
+        <h2>O'YIN TO'XTATILDI</h2>
+        <div class="menu-actions">
+          <button class="btn-royal btn-primary" id="btn-resume">DAVOM ETISH</button>
+          <button class="btn-royal btn-secondary" id="btn-restart-level">BOSHQATDAN BOSHLASH</button>
+          <button class="btn-royal btn-secondary" id="btn-quit-to-menu">BOSH MENYUGA CHIQISH</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- G'ALABA EKRANI -->
+    <div id="victory-modal" class="screen-overlay hidden">
+      <div class="menu-backdrop"></div>
+      <div class="modal-card outcome-card victory-card">
+        <div class="outcome-banner">
+          <span class="laurel">🌿</span>
+          <span class="crown">👑</span>
+          <span class="laurel">🌿</span>
+        </div>
+        <h2 class="outcome-title victory-title">G'ALABA!</h2>
+        <p class="outcome-sub">Barcha dushmanlar tiz cho'kdi. Siz saltanatning yagona Hukmdorisiz!</p>
+        
+        <div class="stars-rating" id="victory-stars">
+          <span class="star active">★</span>
+          <span class="star active">★</span>
+          <span class="star active">★</span>
+        </div>
+
+        <div class="battle-stats" id="victory-stats">
+          <div class="stat-box">
+            <span class="stat-label">Vaqt</span>
+            <span class="stat-val" id="stat-time">01:42</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Zabt etilgan</span>
+            <span class="stat-val" id="stat-captured">8</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">Yo'q qilingan</span>
+            <span class="stat-val" id="stat-killed">340</span>
+          </div>
+        </div>
+
+        <div class="outcome-actions">
+          <button class="btn-royal btn-primary" id="btn-next-level">KEYINGI BOSQICH ➡️</button>
+          <button class="btn-royal btn-secondary" id="btn-victory-menu">BOSH MENYU</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAG'LUBIYAT EKRANI -->
+    <div id="defeat-modal" class="screen-overlay hidden">
+      <div class="menu-backdrop"></div>
+      <div class="modal-card outcome-card defeat-card">
+        <div class="outcome-banner">
+          <span class="skull">💀</span>
+        </div>
+        <h2 class="outcome-title defeat-title">MAG'LUBIYAT!</h2>
+        <p class="outcome-sub">Sizning so'nggi qal'angiz quladi... Lekin kurash hali tugamadi!</p>
+
+        <div class="outcome-actions">
+          <button class="btn-royal btn-primary" id="btn-retry-level">QAYTADAN URINISH 🔄</button>
+          <button class="btn-royal btn-secondary" id="btn-defeat-menu">BOSH MENYU</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- JAVASCRIPT FAYLLARI -->
+  <script src="audio.js"></script>
+  <script src="mapData.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
+
