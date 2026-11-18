@@ -53,11 +53,11 @@
 
     <!-- PASTI PANEL: SEHRLAR VA TEZKOR BOSHQARUV -->
     <div id="bottom-bar" class="hud-panel hidden">
-      <!-- Askar yuborish foizi sozlamasi -->
+      <!-- Askar yuborish rejimi (Barchasi tugaguncha yoki 50%) -->
       <div class="dispatch-toggle-wrap">
-        <span class="label">Yuborish:</span>
-        <button id="btn-dispatch-50" class="btn-toggle active" data-percent="0.5">50%</button>
-        <button id="btn-dispatch-100" class="btn-toggle" data-percent="1.0">100%</button>
+        <span class="label">Oqim:</span>
+        <button id="btn-dispatch-100" class="btn-toggle active" title="Barcha askarlar dona-dona ketma-ket, tugaguncha boradi">Barchasi (Tugaguncha)</button>
+        <button id="btn-dispatch-50" class="btn-toggle" title="Askarlarning 50% qismi oqim bilan boradi">50% Oqim</button>
       </div>
 
       <!-- Tezkor tanlash -->
@@ -219,12 +219,13 @@
           </div>
 
           <div class="info-section">
-            <h3>🎮 Boshqaruv usullari</h3>
+            <h3>🎮 Boshqaruv va Yangi Mexanika</h3>
             <ul>
-              <li><strong>Hujum yoki Ko'chirish:</strong> O'z qal'angizdan dushman yoki neytral qal'aga sichqoncha bilan tortib ulang (Drag & Drop) yoki avval o'z qal'angizni, so'ngra nishonni bosing.</li>
-              <li><strong>Bir nechta qal'ani birdan tanlash:</strong> Maydonda sichqonchani bosib ramka chizing yoki qal'angizga <strong>ikki marta</strong> bosing.</li>
-              <li><strong>Yuborish foizi:</strong> Pastdagi 50% yoki 100% tugmasi orqali qancha askar yuborishni tanlang.</li>
-              <li><strong>Qal'ani kuchaytirish:</strong> Qal'ani tanlab, pastdagi "Kuchaytirish" tugmasini bosing (darajasi oshganda mudofaa va askar o'sishi ortadi).</li>
+              <li><strong>Bir marta bosish - Tugaguncha borish:</strong> O'z binongizdan nishonga bir marta tortib ulang yoki nishonni bosing. Askarlar <strong>dona-dona ketma-ket</strong>, hamma askarlar tugaguncha uzluksiz boradi!</li>
+              <li><strong>Oqimni to'xtatish:</strong> Sichqonchaning o'ng tugmasini bosing yoki o'sha binoni qayta bosing.</li>
+              <li><strong>Dona-dona Jang:</strong> Askarlar yo'lda dushmanga ro'para kelsa, 1-ga-1 qilichbozlik dueli bo'lib to'qnashadi!</li>
+              <li><strong>Barcha binolarni birlashtirish:</strong> Binongizga <strong>ikki marta</strong> bosing yoki <strong>A</strong> tugmasini bosing. Barcha binolardan birdaniga uzluksiz askarlar daryosi oqib boradi!</li>
+              <li><strong>Binoni kuchaytirish:</strong> Binoni tanlab, pastdagi <strong>"Kuchaytirish"</strong> (`U`) tugmasini bosing. Binongiz kattalashib, minoralar va shoxona tomlar qo'shiladi!</li>
               <li><strong>Sehrlar:</strong> Klaviatura orqali <strong>1, 2, 3, 4</strong> tugmalari yoki pastdagi piktogrammalarni bosing.</li>
             </ul>
           </div>
